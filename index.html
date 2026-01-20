@@ -1,0 +1,581 @@
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sumerove.eu | Kolébka civilizace</title>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700&family=Gentium+Plus:ital,wght@0,400;0,700;1,400&family=Lato:wght@300;400;700&display=swap" rel="stylesheet">
+
+    <style>
+        /* --- CSS PROMĚNNÉ & RESET --- */
+        :root {
+            --bg-color: #fdfbf7; /* Papír / světlá hlína */
+            --primary-color: #1a3c6e; /* Lapis Lazuli */
+            --accent-color: #c5a059; /* Zlato / Bronz */
+            --text-color: #2b2b2b; /* Tmavě šedá pro text */
+            --card-bg: #ffffff;
+            --sidebar-width: 280px;
+            --border-radius: 8px;
+            --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            --font-heading: 'Cinzel', serif;
+            --font-body: 'Gentium Plus', serif;
+            --font-ui: 'Lato', sans-serif;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: var(--font-body);
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            line-height: 1.6;
+            background-image: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23c5a059' fill-opacity='0.05'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+        }
+
+        /* --- ROZLOŽENÍ --- */
+        .container {
+            display: flex;
+            min-height: 100vh;
+        }
+
+        /* --- BOČNÍ MENU (NAVIGACE) --- */
+        .sidebar {
+            width: var(--sidebar-width);
+            background-color: var(--primary-color);
+            color: #fff;
+            position: fixed;
+            height: 100vh;
+            overflow-y: auto;
+            padding: 2rem 1rem;
+            z-index: 1000;
+            transition: transform 0.3s ease;
+            box-shadow: 4px 0 15px rgba(0,0,0,0.3);
+            scrollbar-width: thin;
+            scrollbar-color: var(--accent-color) var(--primary-color);
+        }
+
+        .logo {
+            text-align: center;
+            margin-bottom: 2rem;
+            border-bottom: 2px solid var(--accent-color);
+            padding-bottom: 1rem;
+        }
+
+        .logo h1 {
+            font-family: var(--font-heading);
+            font-size: 1.8rem;
+            color: var(--accent-color);
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+
+        .logo span {
+            display: block;
+            font-size: 0.8rem;
+            font-family: var(--font-ui);
+            color: #aabbd6;
+            margin-top: 5px;
+        }
+
+        .cuneiform-deco {
+            font-size: 2rem;
+            color: rgba(255,255,255,0.1);
+            text-align: center;
+            margin-bottom: 10px;
+            user-select: none;
+        }
+
+        .nav-links ul {
+            list-style: none;
+        }
+
+        .nav-links li {
+            margin-bottom: 0.5rem;
+        }
+
+        .nav-links a {
+            display: block;
+            color: #e0e0e0;
+            text-decoration: none;
+            padding: 10px 15px;
+            border-radius: var(--border-radius);
+            font-family: var(--font-ui);
+            font-weight: 700;
+            transition: all 0.2s;
+            border-left: 3px solid transparent;
+        }
+
+        .nav-links a:hover, .nav-links a.active {
+            background-color: rgba(255,255,255,0.1);
+            color: var(--accent-color);
+            border-left-color: var(--accent-color);
+            padding-left: 20px;
+        }
+
+        /* --- HLAVNÍ OBSAH --- */
+        .main-content {
+            margin-left: var(--sidebar-width);
+            padding: 3rem;
+            width: 100%;
+            max-width: 1200px;
+        }
+
+        /* --- Header Mobily --- */
+        .mobile-header {
+            display: none;
+            background-color: var(--primary-color);
+            color: white;
+            padding: 1rem;
+            align-items: center;
+            justify-content: space-between;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 1100;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+        }
+
+        .menu-toggle {
+            background: none;
+            border: none;
+            color: white;
+            font-size: 1.5rem;
+            cursor: pointer;
+        }
+
+        /* --- TYPOGRAFIE A KARTY --- */
+        section {
+            margin-bottom: 4rem;
+            scroll-margin-top: 2rem; /* Pro kotvy */
+        }
+
+        h2 {
+            font-family: var(--font-heading);
+            color: var(--primary-color);
+            font-size: 2.5rem;
+            border-bottom: 3px solid var(--accent-color);
+            display: inline-block;
+            margin-bottom: 2rem;
+            padding-bottom: 0.5rem;
+        }
+        
+        /* Nový styl pro hlavní úvod */
+        .site-intro {
+            background-color: #fff;
+            padding: 2rem;
+            border-radius: var(--border-radius);
+            border-left: 5px solid var(--primary-color);
+            margin-bottom: 3rem;
+            box-shadow: var(--shadow);
+            font-size: 1.1rem;
+        }
+
+        .section-intro {
+            font-size: 1.2rem;
+            margin-bottom: 2rem;
+            color: #555;
+            font-style: italic;
+        }
+
+        .grid-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 20px;
+        }
+
+        .card {
+            background: var(--card-bg);
+            padding: 1.5rem;
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow);
+            border: 1px solid rgba(0,0,0,0.05);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .card::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 4px;
+            height: 100%;
+            background-color: var(--accent-color);
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.15);
+        }
+
+        .card h3 {
+            font-family: var(--font-heading);
+            color: var(--primary-color);
+            margin-bottom: 1rem;
+            font-size: 1.4rem;
+        }
+
+        .card p {
+            margin-bottom: 1rem; /* Zvětšeno pro lepší čitelnost dlouhých textů */
+            font-size: 1rem;
+        }
+
+        .card ul {
+            margin-left: 1.5rem;
+            margin-top: 0.5rem;
+        }
+        
+        .card li {
+            margin-bottom: 0.5rem;
+        }
+
+        /* --- WIKI STYLE PRVKY --- */
+        .wiki-box {
+            background-color: #f8f9fa;
+            border: 1px solid #a2a9b1;
+            padding: 1rem;
+            float: right;
+            width: 300px;
+            margin-left: 2rem;
+            margin-bottom: 1rem;
+            font-size: 0.9rem;
+            border-radius: 4px;
+            display: none; /* Skryté na mobilech, zobrazené na desktopu */
+        }
+        
+        @media (min-width: 992px) {
+            .wiki-box { display: block; }
+        }
+
+        .wiki-title {
+            background: var(--primary-color);
+            color: white;
+            text-align: center;
+            padding: 0.5rem;
+            font-weight: bold;
+            margin: -1rem -1rem 1rem -1rem;
+            border-radius: 3px 3px 0 0;
+        }
+
+        /* --- FOOTER --- */
+        footer {
+            text-align: center;
+            padding: 2rem;
+            background-color: var(--primary-color);
+            color: #aabbd6;
+            font-family: var(--font-ui);
+            margin-top: 4rem;
+            border-top: 5px solid var(--accent-color);
+        }
+
+        /* --- RESPONZIVITA --- */
+        @media (max-width: 991px) {
+            .sidebar {
+                transform: translateX(-100%);
+                width: 260px;
+            }
+            .sidebar.active {
+                transform: translateX(0);
+            }
+            .main-content {
+                margin-left: 0;
+                padding: 1rem;
+                padding-top: 5rem; /* Místo pro fixed header */
+            }
+            .mobile-header {
+                display: flex;
+            }
+            h2 {
+                font-size: 1.8rem;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <header class="mobile-header">
+        <div style="font-family: 'Cinzel', serif; font-weight: bold;">SUMEROVE.EU</div>
+        <button class="menu-toggle" onclick="toggleMenu()">☰</button>
+    </header>
+
+    <div class="container">
+        <nav class="sidebar" id="sidebar">
+            <div class="logo">
+                <div class="cuneiform-deco">𒀭𒆠</div>
+                <h1>Sumerove.eu</h1>
+                <span>Starověká Mezopotámie</span>
+            </div>
+            <div class="nav-links">
+                <ul>
+                    <li><a href="#uvod" onclick="toggleMenu()">1. Úvod: Kolébka</a></li>
+                    <li><a href="#spolecnost" onclick="toggleMenu()">2. Společnost</a></li>
+                    <li><a href="#nabozenstvi" onclick="toggleMenu()">3. Náboženství</a></li>
+                    <li><a href="#mytologie" onclick="toggleMenu()">4. Příběhy a Mýty</a></li>
+                    <li><a href="#historie" onclick="toggleMenu()">5. Historie a Města</a></li>
+                    <li><a href="#archeologie" onclick="toggleMenu()">6. Archeologie</a></li>
+                </ul>
+            </div>
+            <div style="margin-top: 2rem; text-align: center; font-size: 0.8rem; opacity: 0.6;">
+                <p>Design inspirován<br>hliněnými tabulkami</p>
+            </div>
+        </nav>
+
+        <main class="main-content">
+            
+            <div class="site-intro">
+                <h1 style="font-family: var(--font-heading); color: var(--primary-color); margin-bottom: 1rem;">Vítejte na prahu dějin</h1>
+                <p>Představte si svět bez písma, bez kol, bez měst a bez zákonů. Takový byl svět předtím, než se v jižním Iráku, v zemi zvané Sumer, zrodila první lidská civilizace. Vítejte na <strong>Sumerove.eu</strong>, portálu věnovaném starověké Mezopotámii – místu, kde se člověk poprvé rozhodl zkrotit řeky, postavit chrámy sahající až k nebesům a zaznamenat své myšlenky do hlíny.</p>
+                <p style="margin-top: 1rem;">Prozkoumejte s námi tajemství klínového písma, příběhy žárlivých bohů, osudy králů i každodenní život obyčejných lidí, kteří pili pivo, platili daně a báli se démonů úplně stejně, jako my se bojíme neznámého. Toto je příběh o tom, jak začala naše historie.</p>
+            </div>
+
+            <section id="uvod">
+                <h2>1. Úvod: Kolébka civilizace</h2>
+                <div class="wiki-box">
+                    <div class="wiki-title">Sumer</div>
+                    <p><strong>Oblast:</strong> Jižní Mezopotámie (dnešní Irák)</p>
+                    <p><strong>Doba trvání:</strong> cca 4500 – 1900 př. n. l.</p>
+                    <p><strong>Hlavní řeky:</strong> Tigris a Eufrat</p>
+                    <p><strong>Písmo:</strong> Klínové (Logografické/Syllabické)</p>
+                    <p><strong>Etnikum:</strong> Sumerové (původ neznámý)</p>
+                </div>
+                <p class="section-intro">Vše začalo v zemi mezi řekami. Zde, v úrodném bahně, se lidstvo transformovalo z lovců a sběračů na stavitele měst a impérií.</p>
+                
+                <div class="grid-container">
+                    <div class="card">
+                        <h3>Geografie a Řeky</h3>
+                        
+                        <p><strong>Tigris a Eufrat:</strong> Tyto dvě mohutné řeky byly pro Mezopotámii požehnáním i prokletím. Na rozdíl od klidného Nilu v Egyptě byly záplavy Tigridu a Eufratu nepravidelné, ničivé a často přicházely v nevhodnou dobu těsně před sklizní. To nutilo obyvatele ke spolupráci na masivních zavlažovacích projektech.</p>
+                        <p><strong>Úrodný půlměsíc:</strong> Tato oblast se táhne v oblouku od Perského zálivu přes moderní Irák, Sýrii, Libanon, Jordánsko, Izrael až do severního Egypta. Právě zde byly domestikovány první plodiny jako pšenice a ječmen, což umožnilo vznik stálých sídel.</p>
+                    </div>
+                    <div class="card">
+                        <h3>Jazyk a Písmo</h3>
+                        
+                        <p><strong>Klínové písmo:</strong> Původně vzniklo jako systém účetnictví (obrázky ovcí a obilí). Postupem času se stylizovalo do klínů, které se vytlačovaly rákosovým rydlem do vlhké hlíny. Tabulky se pak sušily na slunci nebo vypalovaly.</p>
+                        <p><strong>Sumerština vs. Akkadština:</strong> Sumerština je jazykový unikát – nemá žádné známé příbuzné jazyky. Byla jazykem vzdělanců a rituálů dlouho poté, co přestala být mluvenou řečí. Akkadština (jazyk Babylóňanů a Asyřanů) je semitský jazyk příbuzný dnešní arabštině či hebrejštině a postupně sumerštinu zcela nahradila.</p>
+                        <p><strong>Edubba:</strong> Sumerská škola neboli „Dům tabulek“. Výuka byla tvrdá, trvala od úsvitu do soumraku a učitelé (zvaní "školní otcové") často používali tělesné tresty za špatně napsané znaky.</p>
+                    </div>
+                    <div class="card">
+                        <h3>Vynálezy a Technologie</h3>
+                        <ul>
+                            <li><strong>Kolo:</strong> Původně vynalezeno jako hrnčířský kruh pro rychlejší výrobu nádobí. Až později někoho napadlo otočit ho o 90 stupňů a připevnit k vozu, což způsobilo revoluci v dopravě i válčení.</li>
+                            <li><strong>Pluh:</strong> Zásadní inovace, která umožnila obdělávat tvrdou půdu a násobně zvýšila úrodu, což vedlo k populační explozi.</li>
+                            <li><strong>Zavlažování:</strong> Komplexní systém kanálů, hrází a nádrží, který vyžadoval centrální správu a matematické výpočty.</li>
+                        </ul>
+                    </div>
+                    <div class="card">
+                        <h3>Pád civilizace</h3>
+                        <p><strong>Ekologická katastrofa:</strong> Sumerové doplatili na svůj úspěch. Intenzivní zavlažování v horkém klimatu vedlo po staletích k zasolování půdy. Voda se vypařila, ale sůl zůstala. Úrodná pole se měnila v solnou poušť, výnosy klesaly a centrum moci se muselo přesunout na sever do Babylonu.</p>
+                        <p>Konečnou ránu zasadily nájezdy Elamitů z východu kolem roku 2004 př. n. l., kdy padlo město Ur.</p>
+                    </div>
+                </div>
+            </section>
+
+            <section id="spolecnost">
+                <h2>2. Společnost a každodenní život</h2>
+                <p class="section-intro">Společnost byla složitým strojem, kde měl každý své přesné místo. Od krále, který komunikoval s bohy, až po otroka, který dřel na poli.</p>
+
+                <div class="grid-container">
+                    <div class="card">
+                        <h3>Sociální vrstvy</h3>
+                        
+                        <p><strong>Král (Lugal):</strong> Původně "velký muž" volený pro válku, později dědičný monarcha. Byl považován za zástupce boha na zemi a jeho hlavním úkolem bylo udržovat chrámy a spravedlnost.</p>
+                        <p><strong>Kněžstvo:</strong> Před vznikem králů vládli kněží. I později ovládali obrovské majetky, chrámy fungovaly jako banky i sýpky a zaměstnávaly tisíce lidí.</p>
+                        <p><strong>Svobodní občané:</strong> Řemeslníci, obchodníci, rolníci. Tvořili páteř ekonomiky.</p>
+                        <p><strong>Otroctví:</strong> Otrokem se člověk nestal kvůli barvě pleti, ale jako válečný zajatec nebo (častěji) kvůli dluhům. Otroci mohli vlastnit majetek, mohli se vykoupit a dokonce se mohli oženit se svobodnou osobou.</p>
+                    </div>
+                    <div class="card">
+                        <h3>Role žen a Rodina</h3>
+                        <p><strong>Práva žen:</strong> Na rozdíl od pozdějších dob měly ženy v Sumeru překvapivě vysoká práva. Mohly vlastnit půdu, podnikat v obchodu, být písařkami (vzácně) nebo kněžkami. Mohly iniciovat rozvod, i když to pro ně bylo těžší než pro muže.</p>
+                        <p><strong>Manželství:</strong> Bylo smluvním vztahem mezi rodinami. Nevěra ženy se trestala smrtí (hozením do vody), zatímco muž mohl mít konkubíny. Děti byly považovány za "pojištění" na stáří.</p>
+                        <p><strong>Móda:</strong> Typickým oděvem byla vlněná sukně zvaná <em>kaunakes</em>, která připomínala ovčí rouno. Muži i ženy nosili šperky z dováženého lapisu lazuli a karnelitu. Oči si zvýrazňovali silnými linkami.</p>
+                    </div>
+                    <div class="card">
+                        <h3>Ekonomika a Věda</h3>
+                        <p><strong>Pivo a Ninkasi:</strong> Pivo bylo základní potravinou, pili ho dospělí i děti, protože procesvaření zabíjel bakterie ve vodě. Bylo husté a výživné. Bohyně Ninkasi měla svůj vlastní "Hymnus", který byl vlastně receptem na vaření piva.</p>
+                        <p><strong>Matematika:</strong> Sumerové používali šedesátkovou soustavu. Díky nim má hodina 60 minut, minuta 60 sekund a kruh 360 stupňů. Byli mistry v geometrii potřebné pro vyměřování polí.</p>
+                        <p><strong>Obchod:</strong> Mezopotámie neměla kovy, dřevo ani kámen. Vše museli dovážet z dalekých zemí (Indie, Anatolie, Omán) výměnou za své přebytky obilí a vlněné látky.</p>
+                    </div>
+                    <div class="card">
+                        <h3>Vojenství</h3>
+                        
+                        <p>Sumerové pravděpodobně vynalezli organizovanou válku. Stéla supů ukazuje sevřenou formaci pěchoty s kopími a velkými štíty – předchůdce řecké falangy.</p>
+                        <p>Elitní jednotky používaly bojové vozy tažené onagery (divokými osly). Tyto vozy nesloužily k přímému nárazu, ale jako mobilní platformy pro oštěpaře a lučištníky k narušení linií nepřítele.</p>
+                    </div>
+                </div>
+            </section>
+
+            <section id="nabozenstvi">
+                <h2>3. Náboženství a Duchovní svět</h2>
+                <p class="section-intro">Bohové Mezopotámie nebyli milující otcové, ale mocné a vrtošivé bytosti, kterých bylo třeba se bát. Člověk byl stvořen jen proto, aby na ně pracoval, protože bohové byli unavení z kopání kanálů.</p>
+
+                <div class="grid-container">
+                    <div class="card">
+                        <h3>Koncepty a Rituály</h3>
+                        
+                        <p><strong>Me:</strong> Tajemné božské síly nebo "předpisy", které řídí vesmír. Zahrnovaly vše od "království" a "pravdy" až po "sexuální styk" či "umění tesařství". Kdo vlastnil <em>Me</em>, ovládal civilizaci.</p>
+                        <p><strong>Zikkurat:</strong> Nebyl to hrob jako pyramida, ale chrám na vysoké plošině. Věřilo se, že bohové sestupují z nebe na vrchol zikkuratu. Byl postaven z milionů nepálených cihel. Nejznámější Etemenanki v Babylonu inspiroval biblický příběh o Babylonské věži.</p>
+                        <p><strong>Věštění:</strong> Mezopotámci byli posedlí budoucností. Věštili z jater obětovaných ovcí, z letu ptáků nebo ze snů, aby zjistili vůli bohů.</p>
+                    </div>
+                    <div class="card">
+                        <h3>Panteon (Bohové)</h3>
+                        <p><strong>An:</strong> Vzdálený bůh nebes. Ačkoli byl nejvyšší, do dění na zemi zasahoval málokdy.</p>
+                        <p><strong>Enlil:</strong> Bůh větru a bouře, skutečný vládce panteonu. Často byl vůči lidem nepřátelský (byl to on, kdo seslal potopu světa, protože ho lidé rušili svým hlukem).</p>
+                        <p><strong>Enki (Ea):</strong> Bůh sladkých vod (Abzu), moudrosti a magie. Byl patronem řemesel a ochráncem lidstva, které často varoval před Enlilovými tresty.</p>
+                        <p><strong>Inanna (Ištar):</strong> Nejsložitější postava. Bohyně lásky, plodnosti, ale i brutální války. Její chrámy byly centrem posvátné prostituce a její ambice často vedly ke konfliktům mezi bohy.</p>
+                    </div>
+                    <div class="card">
+                        <h3>Démoni a Podsvětí</h3>
+                        <p><strong>Kur (Země bez návratu):</strong> Sumerské podsvětí bylo temné, prašné místo, kde mrtví jedli prach a pili blátivou vodu. Nebyl zde žádný soud ani ráj – osud byl stejný pro krále i žebráky, pokud jim živí neobětovali jídlo a vodu.</p>
+                        <p><strong>Pazuzu:</strong> Děsivý démon jižního větru s hlavou lva a křídly. Ačkoliv byl zlý, lidé nosili jeho amulety, protože jako jediný dokázal zahnat ještě horší démonku <strong>Lamashtu</strong>, která zabíjela novorozence a těhotné ženy.</p>
+                    </div>
+                </div>
+            </section>
+
+            <section id="mytologie">
+                <h2>4. Příběhy a Literatura</h2>
+                <p class="section-intro">Sumerská literatura je nejstarší na světě. Nejde jen o mýty, ale o hluboké úvahy o smrti, přátelství a smyslu lidské existence.</p>
+                
+                <div class="grid-container">
+                    <div class="card" style="border-left: 5px solid var(--primary-color);">
+                        <h3>Epos o Gilgamešovi</h3>
+                        
+                        <p>Považován za mistrovské dílo starověku. Vypráví o králi Uruku, který tyranizoval své poddané. Bohové stvořili divocha Enkidua, aby ho zkrotil. Po epickém souboji se z nich stali nejlepší přátelé. Společně zabili nestvůru Chumbabu a Nebeského býka.</p>
+                        <p>Když Enkidu za trest zemřel, Gilgameš propadl šílenství ze strachu ze smrti a vydal se hledat tajemství nesmrtelnosti. Nakonec pochopil, že člověk žije věčně pouze skrze své činy a dílo (např. hradby Uruku), které po sobě zanechá.</p>
+                    </div>
+                    <div class="card">
+                        <h3>Mýtus o potopě světa</h3>
+                        <p>Tento příběh předchází biblickou potopu o tisíce let. Hlavní hrdina (zvaný Ziusudra, Atrahasis nebo Utnapištim) je varován bohem Enkim, že se bohové rozhodli vyhladit lidstvo. Postaví obrovskou loď, zachrání svou rodinu a zvířata. Po opadnutí vody vypustí ptáky (holubici, vlaštovku a krkavce), aby našel zemi.</p>
+                    </div>
+                    <div class="card">
+                        <h3>Enúma eliš</h3>
+                        <p>Babylonský mýtus o stvoření. Na počátku existoval jen chaos vod: sladké Apsú a slané Tiamat. Z jejich spojení vzešli bohové. Když mladí bohové začali být hluční, Tiamat se rozhodla je zničit a stvořila armádu monster. Zastavil ji až bůh Marduk, který ji zabil, rozetnul její tělo a z jedné půlky stvořil nebesa a z druhé zemi.</p>
+                    </div>
+                    <div class="card">
+                        <h3>Moudrostní literatura</h3>
+                        <p>Sumerové milovali přísloví a disputace. Příkladem je <strong>"Debata mezi ovcí a obilím"</strong>, kde se tyto dvě komodity hádají, která je pro lidstvo užitečnější (nakonec vyhraje obilí). Populární byly i "Instrukce ze Šuruppaku", sbírka rad otce synovi, která obsahuje perly jako: <em>"Nerozšiřuj se o tom, co jsi našel,"</em> nebo <em>"Nehádej se v hospodě."</em></p>
+                    </div>
+                </div>
+            </section>
+
+            <section id="historie">
+                <h2>5. Historie, Města a Vládci</h2>
+                <p class="section-intro">Historie Mezopotámie je příběhem vzestupů a pádů městských států, které spolu neustále bojovaly o nadvládu nad vodou a obchodními stezkami.</p>
+
+                <div class="grid-container">
+                    <div class="card">
+                        <h3>Klíčová Města</h3>
+                        <ul>
+                            <li><strong>Eridu:</strong> Podle sumerské tradice vůbec první město, které sestoupilo z nebe. Sídlo boha Enkiho.</li>
+                            <li><strong>Uruk:</strong> První skutečné velkoměsto světa. V době největšího rozkvětu mělo až 80 000 obyvatel a masivní hradby.</li>
+                            <li><strong>Ur:</strong> Bohatý přístav a domov biblického Abraháma. Proslul svým skvěle zachovaným zikkuratem.</li>
+                            <li><strong>Babylon:</strong> Pozdější metropole, která se stala centrem kultury, vědy a astronomie. Jeho "Visuté zahrady" byly divem světa.</li>
+                            <li><strong>Ninive:</strong> Hlavní město válečnické Asýrie, známé svou brutalitou, ale i obrovskou knihovnou.</li>
+                        </ul>
+                    </div>
+                    <div class="card">
+                        <h3>Historická období</h3>
+                        <ul>
+                            <li><strong>Urucké období (4000–3100 př. n. l.):</strong> Urbanizace, vznik písma, formování státu.</li>
+                            <li><strong>Raně dynastické období (2900–2350 př. n. l.):</strong> Éra městských států bojujících mezi sebou. Čas Gilgameše.</li>
+                            <li><strong>Akkadská říše (2334–2154 př. n. l.):</strong> První centralizované impérium v dějinách, kde semitská kultura začala dominovat.</li>
+                            <li><strong>3. dynastie z Uru (2112–2004 př. n. l.):</strong> "Sumerská renesance", poslední velký rozkvět sumerské kultury a byrokracie.</li>
+                        </ul>
+                    </div>
+                    <div class="card">
+                        <h3>Mocní vládci</h3>
+                        <p><strong>Sargon Akkadský:</strong> Původně zahradník, který se vypracoval na krále. Legenda o jeho narození (matka ho poslala v košíku po řece) je předobrazem příběhu o Mojžíšovi. Sjednotil Sumer a Akkad.</p>
+                        <p><strong>Chammurapi:</strong> Babylonský král a geniální diplomat. Proslul svým zákoníkem vytesaným do černé stély, který se řídil principem "oko za oko, zub za zub".</p>
+                        <p><strong>Aššurbanipal:</strong> Poslední velký král Asýrie. Na rozdíl od jiných uměl číst a psát. Vyslal písaře do všech koutů říše, aby opsali staré texty, a vytvořil tak slavnou knihovnu v Ninive, díky níž dnes známe Epos o Gilgamešovi.</p>
+                        <p><strong>Nebukadnesar II.:</strong> Ničitel Jeruzaléma, ale také stavitel nádherné Ištařiny brány a procesní cesty v Babylonu.</p>
+                    </div>
+                </div>
+            </section>
+
+            <section id="archeologie">
+                <h2>6. Archeologie a Odkaz</h2>
+                <div class="grid-container">
+                    <div class="card">
+                        <h3>Klíčové nálezy</h3>
+                        
+                        <p><strong>Sumerský královský seznam:</strong> Fascinující dokument, který mísí historii s mýty. První králové údajně vládli desítky tisíc let, než "přišla potopa". Po potopě se délka vlád zkracuje na reálná čísla.</p>
+                        <p><strong>Královský hřbitov v Uru:</strong> Ve 20. letech 20. století ho odkryl Leonard Woolley. Našel nedotčené hrobky plné zlata, hudebních nástrojů a také koster služebnictva, které zřejmě spáchalo rituální sebevraždu, aby doprovodilo krále na onen svět.</p>
+                    </div>
+                    <div class="card">
+                        <h3>Umění a Volný čas</h3>
+                        <p><strong>Urská standarta:</strong> Dřevěná skříňka vykládaná lapisem a perletí. Jedna strana zobrazuje mír (hostinu, hudbu), druhá válku (vozy přejíždějící nepřátele). Je to "komiks" starý 4500 let.</p>
+                        <p><strong>Královská hra z Uru:</strong> Jedna z nejstarších deskových her na světě. Díky jedné tabulce s pravidly, kterou rozluštil Irving Finkel z Britského muzea, dnes přesně víme, jak se hrála. Byla to hra o závod, podobná Člověče nezlob se, ale s hlubším duchovním významem.</p>
+                        <p><strong>Válcové pečeti:</strong> Každý důležitý člověk měl svůj "podpis" ve formě malého válečku s vyrytým obrázkem. Když se váleček převalil přes mokrou hlínu, vytvořil unikátní reliéf.</p>
+                    </div>
+                </div>
+            </section>
+
+            <footer>
+                <p>&copy; 2024 Sumerove.eu | Oživujeme historii Mezopotámie</p>
+                <div style="font-size: 2rem; margin-top: 10px;">𒀭</div>
+            </footer>
+        </main>
+    </div>
+
+    <script>
+        // Mobilní menu toggle
+        function toggleMenu() {
+            const sidebar = document.getElementById('sidebar');
+            sidebar.classList.toggle('active');
+        }
+
+        // Smooth scroll
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                document.querySelector(this.getAttribute('href')).scrollIntoView({
+                    behavior: 'smooth'
+                });
+            });
+        });
+
+        // Scroll Spy
+        window.addEventListener('scroll', () => {
+            let current = '';
+            const sections = document.querySelectorAll('section');
+            const navLi = document.querySelectorAll('.nav-links a');
+
+            sections.forEach(section => {
+                const sectionTop = section.offsetTop;
+                const sectionHeight = section.clientHeight;
+                if (pageYOffset >= (sectionTop - sectionHeight / 3)) {
+                    current = section.getAttribute('id');
+                }
+            });
+
+            navLi.forEach(a => {
+                a.classList.remove('active');
+                if (a.getAttribute('href').includes(current)) {
+                    a.classList.add('active');
+                }
+            });
+        });
+
+        // Parallax efekt
+        document.addEventListener('mousemove', (e) => {
+            const cards = document.querySelectorAll('.card');
+            const x = (window.innerWidth - e.pageX * 2) / 100;
+            const y = (window.innerHeight - e.pageY * 2) / 100;
+            
+            if(window.innerWidth > 992) {
+                cards.forEach(card => {
+                    // card.style.transform = `translateX(${x}px) translateY(${y}px)`; 
+                });
+            }
+        });
+    </script>
+</body>
+</html>
